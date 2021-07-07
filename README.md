@@ -1,1 +1,1 @@
-# aws-ec2-objects
+# ec2-objects
