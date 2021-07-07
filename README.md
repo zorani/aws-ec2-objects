@@ -100,11 +100,11 @@ Some API calls are not specific to any particular region.
 
 All API calls need to be signed with a sig version 4 process which needs a region that you have access to.
 
-So.. to make things easy on our selves please set the AWS_DEFAULT_REGION environment variable to a region you know you  have enabled for your credentials.
+So.. to make things easy on ourselves please set the AWS_DEFAULT_REGION environment variable to a region you know you  have enabled for your credentials.
 
 For example:
 
-    export AWS_SECRET_ACCESS_KEY='us-east-1'
+    export AWS_DEFAULT_REGION='us-east-1'
 
 
 
