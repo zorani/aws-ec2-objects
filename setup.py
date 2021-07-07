@@ -32,7 +32,7 @@ setup(
     author="zoran ilievski",
     author_email="pythonic@clientuser.net",
     url="https://github.com/zorani/aws-ec2-objects",
-    download_url="https://github.com/zorani/aws-ec2-objects/archive/refs/tags/v0.0.1.tar.gz",
+    download_url="https://github.com/zorani/aws-ec2-objects/archive/refs/tags/v0.0.2.tar.gz",
     keywords=["aws", "api", "ec2", "objects", "awsapi"],
     install_requires=["cloudapi", "bs4"],
     classifiers=[
