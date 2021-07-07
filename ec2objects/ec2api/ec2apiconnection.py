@@ -14,9 +14,9 @@ class EC2ApiConnection(BaseRESTAPI):
             # geometric_delay_multiplier=2,
             # maximum_geometric_delay_multiplications=6,
             # maximum_failed_attempts=3,
-            geometric_delay_multiplier=0,
-            maximum_geometric_delay_multiplications=0,
-            maximum_failed_attempts=0,
+            geometric_delay_multiplier=1,
+            maximum_geometric_delay_multiplications=1,
+            maximum_failed_attempts=1,
         )
         self.service = "ec2"
         self.host = "ec2.amazonaws.com"
