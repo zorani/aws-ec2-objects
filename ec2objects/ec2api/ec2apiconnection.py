@@ -17,10 +17,12 @@ class EC2ApiConnection(BaseRESTAPI):
             geometric_delay_multiplier=1,
             maximum_geometric_delay_multiplications=1,
             maximum_failed_attempts=1,
+            # Amazon API needs a large time out, a lot of the calls return large amount of data without pagination.
+            request_timeout=600,
         )
+        # self.baseurl = "https://ec2.amazonaws.com"
         self.service = "ec2"
         self.host = "ec2.amazonaws.com"
-        # self.baseurl = "https://ec2.amazonaws.com"
 
         if "AWS_ACCESS_KEY_ID" in os.environ:
             # print("Token found...")
@@ -56,6 +58,8 @@ class EC2ApiConnection(BaseRESTAPI):
         # API version can be found at the following location for a service.
         # https://docs.aws.amazon.com/AWSEC2/latest/APIReference/ec2-api.pdf
         input_params["Version"] = "2016-11-15"
+     
+
         # input_params["Version"] = "2021-01-01"
         region, request_parameters = self.sigversionfoursigning.splitparams(
             input_params
