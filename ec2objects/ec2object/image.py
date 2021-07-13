@@ -128,5 +128,5 @@ class ImageManager:
 class Image:
     def __init__(self):
         self.attributes = ImageAttributes()
-        self.ebsblockdevices = None
-        self.virtualblockdevices = None
+        self.ebsblockdevices = []
+        self.virtualblockdevices = []
