@@ -83,36 +83,6 @@ class ImageManager:
     def __init__(self):
         self.imageapi = Images()
 
-    def retrieve_all_images(self):
-        image_objects = []
-        response = self.imageapi.list_all_public_images()
-        if response:
-            content = json.loads(response.content.decode("utf-8"))
-            image_datas = content["images"]
-            for image_data in image_datas:
-                blockDeviceMapping = image_data.pop("blockDeviceMapping")
-                ebs_devices = []
-                virtual_devices = []
-                for ebs_device in blockDeviceMapping["ebs"]:
-                    new_ebs_device = BlockDeviceMappingEBS(**ebs_device)
-                    ebs_devices.append(new_ebs_device)
-                for virtual_device in blockDeviceMapping["virtual"]:
-                    new_virtual_device = BlockDeviceMappingVirtual(**virtual_device)
-                    virtual_devices.append(new_virtual_device)
-                newimage = Image()
-                newimage.attributes = ImageAttributes(**image_data)
-                if len(ebs_devices) > 0:
-                    newimage.ebsblockdevices = ebs_devices
-                else:
-                    newimage.ebsblockdevices = []
-                if len(virtual_devices) > 0:
-                    newimage.virtualblockdevices = virtual_devices
-                else:
-                    newimage.virtualblockdevices = []
-
-                image_objects.append(newimage)
-            return image_objects
-
     def retrieve_all_amazon_public_images(self):
         image_objects = []
         json_results = self.imageapi.list_all_amazon_public_images()
