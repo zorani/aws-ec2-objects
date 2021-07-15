@@ -34,7 +34,7 @@ setup(
     url="https://github.com/zorani/aws-ec2-objects",
     download_url="https://github.com/zorani/aws-ec2-objects/archive/refs/tags/v0.0.3.tar.gz",
     keywords=["aws", "api", "ec2", "objects", "awsapi"],
-    install_requires=["cloudapi", "bs4"],
+    install_requires=["cloudapi", "bs4", "boto3"],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Intended Audience :: Developers",
