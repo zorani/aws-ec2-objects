@@ -6,6 +6,6 @@ from .ec2object.image import ImageManager as ImageManager
 from .ec2object.image import Image as Image
 
 ###API TESTS####DELETE
-from .ec2api.images import Images as Images
+# from .ec2api.images import Images as Images
 
 ################
