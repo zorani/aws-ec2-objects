@@ -19,6 +19,11 @@ Please visit <a href="https://github.com/zorani/aws-ec2-objects">GitHub</a> page
 		- [Retrieve All Regions](#retrieve-all-regions)
 		- [Retrieve Regions Enabled For Your Account](#retrieve-regions-enabled-for-your-account)
 	- [Region Object](#region-object)
+- [Images](#images)
+	- [Image Manager](#image-manager)
+		- [Retrieve All Amazon Public Images](#retrieve-all-amazon-public-images)
+		- [Retrieve Image By ImageId](#retrieve-image-by-imageid)
+	- [Image Object](#image-object)
 # How to install
 
 Here are your options.
@@ -85,8 +90,15 @@ You can uninstall using the usual command,
 **[⬆ back to top](#table-of-contents)**
 
 # Configurations
+## BOTO 3
+ec2objects uses [boto3](https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html) to interact with the amazon api.
+Decided to go with boto3 as it gives nice json responses instead of the xml mess direct interaction with the api gives.
 
-## Token
+You can find further token requirements and details at the above link.
+
+Here is are the quick start requirements for ec2objects.
+
+## Token: Required
 
 Set the AWS_ACCESS_KEY_ID, and the AWS_SECRET_ACCESS_KEY environment variables with your amazon aws access credentials.
 
@@ -94,11 +106,8 @@ Set the AWS_ACCESS_KEY_ID, and the AWS_SECRET_ACCESS_KEY environment variables w
 
     export AWS_SECRET_ACCESS_KEY='xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
 
-## Default Region
+## Default Region: Required
 
-Some API calls are not specific to any particular region.
-
-All API calls need to be signed with a sig version 4 process which needs a region that you have access to.
 
 So.. to make things easy on ourselves please set the AWS_DEFAULT_REGION environment variable to a region you know you  have enabled for your credentials.
 
@@ -111,38 +120,6 @@ For example:
 
 ## api connection settings
 
-You don't need to look too deeply here, this is for information only.
-
-ec2objects is powered by a baserestapi class from the following project.
-
-https://github.com/zorani/cloudapi/blob/main/cloudapi/baserestapi.py
-
-ec2objects/ec2api/ec2apiconnection.py inherits baserestapi, 
-baseresapi takes care of all the tricky rate limiting.
-
-Inside /ec2apiconnection.py you will find
-a 'callrateperhour' variable set to a limit of 5000 which is common for other services.
-ec2objects converts 'callrateperhour' to seconds between requests.
-
-You will also see the following variables.
-
-geometric_delay_multiplier: If a request fails, the 'seconds between requests' is increased by multiplying by this number.
-
-maximum_geometric_delay_multiplicaiton: How many times should you increase the 'seconds between requests' before considering it a fail.
-
-maximum_failed_attempts: a failed attempt is put to the back of an internal queue for a retry. how many failed attempts are allowed before
-                         returning the response with failure codes and content.
-
-```python
-        BaseRESTAPI.__init__(
-            self,
-            baseurl="https://ec2.amazonaws.com",
-            callrateperhour=5000,
-            geometric_delay_multiplier=2,
-            maximum_geometric_delay_multiplications=6,
-            maximum_failed_attempts=3,
-        )
-```
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -193,7 +170,106 @@ class Region:
 ```python
 @dataclass
 class RegionAttributes:
-    regionName: str = None
-    regionEndpoint: str = None
+    RegionName: str = None
+    Endpoint: str = None
+    OptInStatus: str = None
+```
+**[⬆ back to top](#table-of-contents)**
+
+# Images
+An Amazon Machine Image ([AMI User Guide](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html)) provides the information required to launch an instance. 
+
+[AMI BOTO3 API GUIDE](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#image) details at this link.
+
+An AMI includes the following:
+
+-   One or more Amazon Elastic Block Store (Amazon EBS) snapshots, or, for instance-store-backed AMIs, a template for the root volume of the instance (for example, an operating system, an application server, and applications).
+    
+-   Launch permissions that control which AWS accounts can use the AMI to launch instances.
+    
+-   A block device mapping that specifies the volumes to attach to the instance when it's launched.
+
+Import the ec2object Image and ImageManger to interact with Regions.
+```python
+from ec2objects import Image, ImageManager
+```
+## Image Manager
+Create an image manager.
+```python
+image_manager = ImageManager()
+```
+
+### Retrieve All Amazon Public Images
+Retrieve a list of image objects.
+```python
+list_of_all_amazon_public_image_objects = image_manager.retrieve_all_regions()
+```
+### Retrieve Image By ImageId
+Retrieve an image object by ImageId.
+```python
+image_object = image_manager.retrieve_image("ami-fd534b97")
+```
+**[⬆ back to top](#table-of-contents)**
+## Image Object
+
+Image objects contains an attributes data class with the standard ec2 [image attributes](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Client.describe_images), descriptions available at this link.
+
+Each object also contains a list of ebsblockdevices, and a list of virtuablockdevices - empty if none exists.
+
+ebsblockdevices  holds a list of BlockDeviceMappingEBS if they exist.
+
+virtualblockdevices holds a list of BlockDeviceMappingVirtual if they exist.
+
+```python
+class Image:
+    def __init__(self):
+        self.attributes = ImageAttributes()
+        self.ebsblockdevices = []
+        self.virtualblockdevices = []
+```
+```python
+@dataclass
+class ImageAttributes:
+    Architecture: str = None
+    CreationDate: str = None
+    ImageId: str = None
+    ImageLocation: str = None
+    ImageType: str = None
+    Public: bool = None
+    KernelId: str = None
+    OwnerId: str = None
+    Platform: str = None
+    PlatformDetails: str = None
+    UsageOperation: str = None
+    RamdiskId: str = None
+    State: str = None
+    Description: str = None
+    EnaSupport: bool = None
+    Hypervisor: str = None
+    ImageOwnerAlias: str = None
+    Name: str = None
+    RootDeviceName: str = None
+    RootDeviceType: str = None
+    SriovNetSupport: str = None
+    VirtualizationType: str = None
+    BootMode: str = None
+    DepricationTime: str = None
+```
+
+```python
+@dataclass
+class BlockDeviceMappingEBS:
+    DeviceName: str = None
+    SnapshotId: str = None
+    VolumeSize: str = None
+    DeleteOnTermination: bool = None
+    VolumeType: str = None
+    Encrypted: bool = None
+```
+```python
+@dataclass
+class BlockDeviceMappingVirtual:
+    DeviceName: str = None
+    VirtualName: str = None
 ```
 **[⬆ back to top](#table-of-contents)**

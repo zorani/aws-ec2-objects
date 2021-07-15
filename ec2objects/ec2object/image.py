@@ -37,7 +37,7 @@ class ImageAttributes:
     ImageLocation: str = None
     ImageType: str = None
     Public: bool = None
-    KernalId: str = None
+    KernelId: str = None
     OwnerId: str = None
     Platform: str = None
     PlatformDetails: str = None
@@ -113,35 +113,31 @@ class ImageManager:
                 image_objects.append(newimage)
             return image_objects
 
-    def retrieve_all_amazon_public_x86_64_images(self):
+    def retrieve_all_amazon_public_images(self):
         image_objects = []
-        json_results = self.imageapi.list_all_amazon_public_x86_64_images()
-        if response:
-            content = json.loads(response.content.decode("utf-8"))
-            image_datas = content["images"]
-            for image_data in image_datas:
-                blockDeviceMapping = image_data.pop("blockDeviceMapping")
-                ebs_devices = []
-                virtual_devices = []
-                for ebs_device in blockDeviceMapping["ebs"]:
-                    new_ebs_device = BlockDeviceMappingEBS(**ebs_device)
-                    ebs_devices.append(new_ebs_device)
-                for virtual_device in blockDeviceMapping["virtual"]:
-                    new_virtual_device = BlockDeviceMappingVirtual(**virtual_device)
-                    virtual_devices.append(new_virtual_device)
-                newimage = Image()
-                newimage.attributes = ImageAttributes(**image_data)
-                if len(ebs_devices) > 0:
-                    newimage.ebsblockdevices = ebs_devices
-                else:
-                    newimage.ebsblockdevices = []
-                if len(virtual_devices) > 0:
-                    newimage.virtualblockdevices = virtual_devices
-                else:
-                    newimage.virtualblockdevices = []
-
-                image_objects.append(newimage)
-            return image_objects
+        json_results = self.imageapi.list_all_amazon_public_images()
+        image_datas = json_results["Images"]
+        for image_data in image_datas:
+            ebsblockdevices = []
+            virtualblockdevices = []
+            if "BlockDeviceMappings" in image_data:
+                BlockDeviceMappings = image_data.pop("BlockDeviceMappings")
+                (
+                    ebsblockdevices,
+                    virtualblockdevices,
+                ) = self._extract_block_device_mapping(BlockDeviceMappings)
+            # if "ProductCodes" in image_data:
+            #    ProductCodes = image_data.pop("ProductCodes")
+            # if "StateReason" in image_data:
+            #    StateReason = image_data.pop("StateReason")
+            # if "Tags" in image_data:
+            #    Tags = image_data.pop("Tags")
+            newimage = Image()
+            newimage.attributes = ImageAttributes(**image_data)
+            newimage.ebsblockdevices = ebsblockdevices
+            newimage.virtualblockdevices = virtualblockdevices
+            image_objects.append(newimage)
+        return image_objects
 
     def retrieve_image(self, imageId):
         json_results = self.imageapi.retrieve_image(imageId)
@@ -153,54 +149,43 @@ class ImageManager:
         virtualblockdevices = []
         if "BlockDeviceMappings" in image_data:
             BlockDeviceMappings = image_data.pop("BlockDeviceMappings")
-            ebsblockdevices, virtualblockdevices = self.extract_block_device_mapping(
+            ebsblockdevices, virtualblockdevices = self._extract_block_device_mapping(
                 BlockDeviceMappings
             )
-            # BlockDeviceMappings = image_data.pop("BlockDeviceMappings")
-            # for BlockDeviceMapping in BlockDeviceMappings:
-            #    if "Ebs" in BlockDeviceMapping:
-            #        newebsbd = BlockDeviceMappingEBS()
-            #        newebsbd.DeviceName = BlockDeviceMapping["DeviceName"]
-            #        newebsbd.SnapshotId = BlockDeviceMapping["Ebs"]["SnapshotId"]
-            #        newebsbd.DeleteOnTermination = BlockDeviceMapping["Ebs"][
-            #            "DeleteOnTermination"
-            #        ]
-            #        newebsbd.VolumeSize = BlockDeviceMapping["Ebs"]["VolumeSize"]
-            #        newebsbd.VolumeType = BlockDeviceMapping["Ebs"]["VolumeType"]
-            #        newebsbd.Encrypted = BlockDeviceMapping["Ebs"]["Encrypted"]
-            #        ebsblockdevices.append(newebsbd)
-            #    if "VirtualName" in BlockDeviceMapping:
-            #        newvirtual = BlockDeviceMappingVirtual()
-            #        newvirtual.DeviceName = BlockDeviceMapping["DeviceName"]
-            #        newvirtual.VirtualName = BlockDeviceMapping["VirtualName"]
-            #        virtualblockdevices.append(newvirtual)
-            #    # print(BlockDeviceMapping)
-        if "ProductCodes" in image_data:
-            ProductCodes = image_data.pop("ProductCodes")
-        if "StateReason" in image_data:
-            StateReason = image_data.pop("StateReason")
-        if "Tags" in image_data:
-            Tags = image_data.pop("Tags")
+        # if "ProductCodes" in image_data:
+        #    ProductCodes = image_data.pop("ProductCodes")
+        #    print(ProductCodes)
+        # if "StateReason" in image_data:
+        #    StateReason = image_data.pop("StateReason")
+        #    print(StateReason)
+        # if "Tags" in image_data:
+        #    Tags = image_data.pop("Tags")
+        #    print(Tags)
         newimage = Image()
         newimage.attributes = ImageAttributes(**image_data)
         newimage.ebsblockdevices = ebsblockdevices
         newimage.virtualblockdevices = virtualblockdevices
         return newimage
 
-    def extract_block_device_mapping(self, BlockDeviceMappings):
+    def _extract_block_device_mapping(self, BlockDeviceMappings):
         ebsblockdevices = []
         virtualblockdevices = []
         for BlockDeviceMapping in BlockDeviceMappings:
             if "Ebs" in BlockDeviceMapping:
                 newebsbd = BlockDeviceMappingEBS()
                 newebsbd.DeviceName = BlockDeviceMapping["DeviceName"]
-                newebsbd.SnapshotId = BlockDeviceMapping["Ebs"]["SnapshotId"]
-                newebsbd.DeleteOnTermination = BlockDeviceMapping["Ebs"][
-                    "DeleteOnTermination"
-                ]
-                newebsbd.VolumeSize = BlockDeviceMapping["Ebs"]["VolumeSize"]
-                newebsbd.VolumeType = BlockDeviceMapping["Ebs"]["VolumeType"]
-                newebsbd.Encrypted = BlockDeviceMapping["Ebs"]["Encrypted"]
+                if "SnapshotId" in BlockDeviceMapping["Ebs"]:
+                    newebsbd.SnapshotId = BlockDeviceMapping["Ebs"]["SnapshotId"]
+                if "DeleteOnTermination" in BlockDeviceMapping["Ebs"]:
+                    newebsbd.DeleteOnTermination = BlockDeviceMapping["Ebs"][
+                        "DeleteOnTermination"
+                    ]
+                if "VolumeSize" in BlockDeviceMapping["Ebs"]:
+                    newebsbd.VolumeSize = BlockDeviceMapping["Ebs"]["VolumeSize"]
+                if "VolumeType" in BlockDeviceMapping["Ebs"]:
+                    newebsbd.VolumeType = BlockDeviceMapping["Ebs"]["VolumeType"]
+                if "Encrypted" in BlockDeviceMapping["Ebs"]:
+                    newebsbd.Encrypted = BlockDeviceMapping["Ebs"]["Encrypted"]
                 ebsblockdevices.append(newebsbd)
             if "VirtualName" in BlockDeviceMapping:
                 newvirtual = BlockDeviceMappingVirtual()
