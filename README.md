@@ -21,8 +21,8 @@ Please visit <a href="https://github.com/zorani/aws-ec2-objects">GitHub</a> page
 	- [Region Object](#region-object)
 - [Images](#images)
 	- [Image Manager](#image-manager)
-		- [Retrieve All Amazon Public Images](#retrieve-all-amazon-public-images)
 		- [Retrieve Image By ImageId](#retrieve-image-by-imageid)
+		- [Retrieve Ubuntu Images](#retrieve-ubuntu-images)
 	- [Image Object](#image-object)
 # How to install
 
@@ -212,17 +212,58 @@ Create an image manager.
 ```python
 image_manager = ImageManager()
 ```
-
-### Retrieve All Amazon Public Images
-Retrieve a list of image objects.
-```python
-list_of_all_amazon_public_image_objects = image_manager.retrieve_all_regions()
-```
 ### Retrieve Image By ImageId
 Retrieve an image object by ImageId.
 ```python
 image_object = image_manager.retrieve_image("ami-fd534b97")
 ```
+
+
+### Retrieve Ubuntu Images
+
+Okay, so the AWS documentation is a bit difficult.
+Going to break it down and try to extract and common sense.. thanks aws.
+
+The following methods retrieve Ubuntu images that have...
+
+Architechture:'x86_64' or 'arm64'
+ImageType:'machine'
+
+hvm-ssd: **Important** What does this mean?
+The instance created from this image(an hvm-ssd) will have small root storage,
+/dev/sda1, to hold the OS.
+/dev/sda1 is ephemeral storage is the **volatile temporary storage attached to your instances** which is only present during the running lifetime of the instance. Data will be available on restart but will be destroyed on instance termination.
+
+For longer term data storage you do need to attach an existing Elastic Block Storage (EBS) device for or create and attach new EBS and attach that.
+
+...and HVM?
+
+HVM (known as **Hardware Virtual Machine**) is the type of instance that mimics bare-metal server setup which provides better hardware isolation. With this instance type, the OS can run directly on top of the Virtual Machine without additional configuration making it to look like it is running on a real physical server.
+
+#### Retrieve All x86_64 Ubuntu hvm-ssd machine images
+
+Retrieve a list of image objects.
+
+Argument 'name' is optional and can be excluded entirely. 
+You can request individual Ubuntu releases using the first string of the release code names found at https://wiki.ubuntu.com/Releases 
+e.g. name="focal", name="bionic", name="trusty"
+        
+```python
+list_of_image_objects =retrieve_all_ubuntu_x86_64_machine_images_hvm_ssd(self, name="")
+```
+
+#### Retrieve All arm64 Ubuntu hvm-ssd machine images
+
+Retrieve a list of image objects.
+
+Argument 'name' is optional and can be excluded entirely. 
+You can request individual Ubuntu releases using the first string of the release code names found at https://wiki.ubuntu.com/Releases 
+e.g. name="focal", name="bionic", name="trusty"
+
+```python
+list_of_image_objects =retrieve_all_ubuntu_arm64_machine_images_hvm_ssd(self, name="")
+```
+
 **[⬆ back to top](#table-of-contents)**
 ## Image Object
 

@@ -21,3 +21,8 @@ class APIKeys(Exception):
 class RegionNotFound(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
+
+
+class KeyPairNameAlreadyExists(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)

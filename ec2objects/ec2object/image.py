@@ -10,24 +10,6 @@ import threading
 import time
 import re
 
-# <item>\n
-# <imageId>ari-e6bc478f</imageId>\n
-# <imageLocation>ec2-paid-ibm-was-us-east-1/initrd-2.6.16.60-0.30-xen.x86_64.manifest.xml</imageLocation>\n
-# <imageState>available</imageState>\n
-# <imageOwnerId>470254534024</imageOwnerId>\n
-# <creationDate>2011-06-24T20:34:25.000Z</creationDate>\n
-# <isPublic>true</isPublic>\n
-# <architecture>x86_64</architecture>\n
-# <imageType>ramdisk</imageType>\n
-# <imageOwnerAlias>amazon</imageOwnerAlias>\n
-# <rootDeviceType>instance-store</rootDeviceType>\n
-# <blockDeviceMapping/>\n
-# <virtualizationType>paravirtual</virtualizationType>\n
-# <hypervisor>xen</hypervisor>\n
-# <platformDetails>Linux/UNIX</platformDetails>\n
-# <usageOperation>RunInstances</usageOperation>\n
-# </item>\n
-
 
 @dataclass
 class ImageAttributes:
