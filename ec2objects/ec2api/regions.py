@@ -22,3 +22,14 @@ class Regions:
     def list_all_regions(self):
         regions_json = self.ec2_client.describe_regions(AllRegions=True)
         return regions_json
+
+    def list_availabitily_zones_for_region(self, regionname):
+        local_client = boto3.client("ec2", region_name=regionname)
+        availabilityzones_json = local_client.describe_availability_zones(
+            Filters=[
+                {"Name": "region-name", "Values": [regionname]},
+                # {"Name": "group-name", "Values": [regionname]},
+            ],
+        )
+        return availabilityzones_json
+        # return self.availabilityzoens[regionname]
