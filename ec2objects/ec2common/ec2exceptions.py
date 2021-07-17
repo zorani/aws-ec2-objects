@@ -16,3 +16,8 @@ class HostEndpoint(Exception):
 class APIKeys(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
+
+
+class RegionNotFound(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
