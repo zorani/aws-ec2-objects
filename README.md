@@ -260,7 +260,7 @@ You can request individual Ubuntu releases using the first string of the release
 e.g. name="focal", name="bionic", name="trusty"
         
 ```python
-list_of_image_objects =retrieve_all_ubuntu_x86_64_machine_images_hvm_ssd(self, name="")
+list_of_image_objects =image_manager.retrieve_all_ubuntu_x86_64_machine_images_hvm_ssd(self, name="")
 ```
 
 #### Retrieve All arm64 Ubuntu hvm-ssd machine images
@@ -272,7 +272,7 @@ You can request individual Ubuntu releases using the first string of the release
 e.g. name="focal", name="bionic", name="trusty"
 
 ```python
-list_of_image_objects =retrieve_all_ubuntu_arm64_machine_images_hvm_ssd(self, name="")
+list_of_image_objects =image_manager.retrieve_all_ubuntu_arm64_machine_images_hvm_ssd(self, name="")
 ```
 
 **[⬆ back to top](#table-of-contents)**
