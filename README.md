@@ -115,7 +115,7 @@ For example:
 
     export AWS_DEFAULT_REGION='us-east-1'
 
-For relivent commands you can specify a completely different region if you need to act on a different region.
+For relevant commands you can specify a completely different region if you need to act on a different region.
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -173,7 +173,8 @@ class RegionAttributes:
     OptInStatus: str = None
 ```
 
-```python@dataclass
+```python
+@dataclass
 class AvailabilityZones:
     State: str = None
     OptInStatus: str = None
