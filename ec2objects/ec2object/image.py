@@ -83,9 +83,13 @@ class ImageManager:
     def __init__(self):
         self.imageapi = Images()
 
-    def retrieve_all_amazon_public_images(self):
+    def retrieve_all_ubuntu_x86_64_machine_images_hvm_ssd(self, name=""):
+        # https://wiki.ubuntu.com/Releases
+        # uset the first string of the code name e.g. Focal, Bionic, Trusty
         image_objects = []
-        json_results = self.imageapi.list_all_amazon_public_images()
+        json_results = self.imageapi.list_all_ubuntu_x86_64_machine_images_hvm_ssd(
+            name=name
+        )
         image_datas = json_results["Images"]
         for image_data in image_datas:
             ebsblockdevices = []
@@ -96,17 +100,39 @@ class ImageManager:
                     ebsblockdevices,
                     virtualblockdevices,
                 ) = self._extract_block_device_mapping(BlockDeviceMappings)
-            # if "ProductCodes" in image_data:
-            #    ProductCodes = image_data.pop("ProductCodes")
-            # if "StateReason" in image_data:
-            #    StateReason = image_data.pop("StateReason")
-            # if "Tags" in image_data:
-            #    Tags = image_data.pop("Tags")
             newimage = Image()
             newimage.attributes = ImageAttributes(**image_data)
             newimage.ebsblockdevices = ebsblockdevices
             newimage.virtualblockdevices = virtualblockdevices
             image_objects.append(newimage)
+        if len(image_objects) > 1:
+            image_objects.sort(key=lambda x: x.attributes.Name, reverse=True)
+        return image_objects
+
+    def retrieve_all_ubuntu_arm64_machine_images_hvm_ssd(self, name=""):
+        # https://wiki.ubuntu.com/Releases
+        # uset the first string of the code name e.g. Focal, Bionic, Trusty
+        image_objects = []
+        json_results = self.imageapi.list_all_ubuntu_arm64_machine_images_hvm_ssd(
+            name=name
+        )
+        image_datas = json_results["Images"]
+        for image_data in image_datas:
+            ebsblockdevices = []
+            virtualblockdevices = []
+            if "BlockDeviceMappings" in image_data:
+                BlockDeviceMappings = image_data.pop("BlockDeviceMappings")
+                (
+                    ebsblockdevices,
+                    virtualblockdevices,
+                ) = self._extract_block_device_mapping(BlockDeviceMappings)
+            newimage = Image()
+            newimage.attributes = ImageAttributes(**image_data)
+            newimage.ebsblockdevices = ebsblockdevices
+            newimage.virtualblockdevices = virtualblockdevices
+            image_objects.append(newimage)
+        if len(image_objects) > 1:
+            image_objects.sort(key=lambda x: x.attributes.Name, reverse=True)
         return image_objects
 
     def retrieve_image(self, imageId):

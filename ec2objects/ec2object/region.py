@@ -18,6 +18,21 @@ class RegionAttributes:
     OptInStatus: str = None
 
 
+@dataclass
+class AvailabilityZones:
+    State: str = None
+    OptInStatus: str = None
+    Messages: list = field(default_factory=list)
+    RegionName: str = None
+    ZoneName: str = None
+    ZoneId: str = None
+    GroupName: str = None
+    NetworkBorderGroup: str = None
+    ZoneType: str = None
+    ParentZoneName: str = None
+    ParentZoneId: str = None
+
+
 class RegionManager:
     def __init__(self):
         self.regionapi = Regions()
@@ -30,6 +45,9 @@ class RegionManager:
         for region_data in region_datas:
             newregion = Region()
             newregion.attributes = RegionAttributes(**region_data)
+            newregion.availabilityzones = self.retrieve_availability_zones(
+                newregion.attributes.RegionName
+            )
             region_objects.append(newregion)
         return region_objects
 
@@ -41,10 +59,29 @@ class RegionManager:
         for region_data in region_datas:
             newregion = Region()
             newregion.attributes = RegionAttributes(**region_data)
+            newregion.availabilityzones = self.retrieve_availability_zones(
+                newregion.attributes.RegionName
+            )
             region_objects.append(newregion)
         return region_objects
+
+    def retrieve_availability_zones(self, regionname):
+        availability_zones = []
+        try:
+            availabilityzones_json = self.regionapi.list_availabitily_zones_for_region(
+                regionname
+            )
+            availabilityzones_datas = availabilityzones_json["AvailabilityZones"]
+            for availabilityzones_data in availabilityzones_datas:
+                newavailabilityzone = AvailabilityZones(**availabilityzones_data)
+                availability_zones.append(newavailabilityzone)
+        except:
+            pass
+
+        return availability_zones
 
 
 class Region:
     def __init__(self):
         self.attributes = RegionAttributes()
+        self.availabilityzones = []
