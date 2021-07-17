@@ -109,17 +109,13 @@ Set the AWS_ACCESS_KEY_ID, and the AWS_SECRET_ACCESS_KEY environment variables w
 ## Default Region: Required
 
 
-So.. to make things easy on ourselves please set the AWS_DEFAULT_REGION environment variable to a region you know you  have enabled for your credentials.
+Please set the AWS_DEFAULT_REGION environment variable to a region you know you  have enabled for your credentials.
 
 For example:
 
     export AWS_DEFAULT_REGION='us-east-1'
 
-
-
-
-## api connection settings
-
+For relivent commands you can specify a completely different region if you need to act on a different region.
 
 **[⬆ back to top](#table-of-contents)**
 
@@ -160,11 +156,13 @@ list_of_enabled_region_objects = region_manager.retrieve_regions_enabled_for_my_
 
 Region objects contains an attributes data class with the standard ec2 [region attributes](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_Region.html).
 
+Region objects also contain a list of availability zones data classes for that region.
 
 ```python
 class Region:
     def __init__(self):
         self.attributes = RegionAttributes()
+        self.availabilityzones = []
         ...
 ```
 ```python
@@ -173,6 +171,21 @@ class RegionAttributes:
     RegionName: str = None
     Endpoint: str = None
     OptInStatus: str = None
+```
+
+```python@dataclass
+class AvailabilityZones:
+    State: str = None
+    OptInStatus: str = None
+    Messages: list = field(default_factory=list)
+    RegionName: str = None
+    ZoneName: str = None
+    ZoneId: str = None
+    GroupName: str = None
+    NetworkBorderGroup: str = None
+    ZoneType: str = None
+    ParentZoneName: str = None
+    ParentZoneId: str = None
 ```
 **[⬆ back to top](#table-of-contents)**
 
