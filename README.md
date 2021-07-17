@@ -24,6 +24,17 @@ Please visit <a href="https://github.com/zorani/aws-ec2-objects">GitHub</a> page
 		- [Retrieve Image By ImageId](#retrieve-image-by-imageid)
 		- [Retrieve Ubuntu Images](#retrieve-ubuntu-images)
 	- [Image Object](#image-object)
+- [SSH Key Pairs](#ssh-key-pairs)
+   - [KeyPair Manager](#keypair-manager)
+	   - [Retrieve Keypairs](#retrieve-keypairs)
+	   - [Retrieve Keypair By Name](#retrieve-keypair-by-name)
+	   - [Retrieve Keypair By ID](#retrieve-keypair-by-id)
+	   - [Retrieve Keypair By Fingerprint](#retrieve-keypair-by-fingerpring)
+	   - [Retrieve Keypairs By Tag Keyname](#retrieve-keypairs-by-tag-keyname)
+	   - [Retrieve Keypairs By Tag](#retrieve-keypairs-by-tag)
+	   - [Upload Keypair RSA](#upload-keypair-rsa)
+	- [KeyPair Object](#keypair-object)
+	  - [Delete Keypair](#delete-keypair)
 # How to install
 
 Here are your options.
@@ -327,4 +338,106 @@ class BlockDeviceMappingVirtual:
     DeviceName: str = None
     VirtualName: str = None
 ```
+**[⬆ back to top](#table-of-contents)**
+
+# SSH Key Pairs
+A [key pair](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html), consisting of a public key and a private key, is a set of security credentials that you use to prove your identity when connecting to an EC2 instance.
+Import the ec2object KeyPair and KeyPairManger to interact with SSH Key Pairs.
+```python
+from ec2objects import KeyPair, KeyPairManager
+```
+## KeyPair Manager
+Create a keypair manager.
+```python
+keypair_manager = KeyPairManager()
+```
+### Retrieve Keypairs
+Retrieve all of your keypairs.
+```python
+list_of_keypair_objects=retrieve_keypairs()
+```
+
+### Retrieve Keypair By Name
+Retrieve all of your keypairs by keypair name.
+AWS keypair names are unique.
+
+```python
+list_of_keypair_objects=retrieve_keypair_by_name(str:name)
+```
+### Retrieve Keypair By ID
+Retrieve all of your keypairs by keypair ID.
+
+```python
+list_of_keypair_objects=retrieve_keypair_by_id(str:keypairid)
+```
+### Retrieve Keypair By Fingerprint
+Retrieve all of your keypairs by key fingerprint.
+
+```python
+list_of_keypair_objects=retrieve_keypair_by_fingerprint(str:fingerprint)
+```
+### Retrieve Keypairs By Tag Keyname
+Retrieve all of your keypairs by the name of a tag key, not it's actual tag content.
+
+```python
+list_of_keypair_objects=retrieve_keypair_by_tag_keyname(str:tagkeyname)
+```
+### Retrieve Keypairs By Tag
+
+Retrieve all of your keypairs by supplying the name of a tag, and the tag value.
+
+```python
+list_of_keypair_objects=retrieve_keypair_by_tag(str:key,str:value)
+```
+### Upload Keypair RSA
+
+AWS will only accept RSA keys for upload.
+This method will return ONE keypair object with the details of the new key uploaded to AWS.
+
+```python
+uploadedkey = myKeyPairManager.upload_keypair_rsa(str:keyname, str:ssh_public_key, dict:tags)
+```
+where you provide tags for your keypair in the form of a dict, e.g.
+```python
+tags = {}
+tags["tag1"] = "value1"
+tags["apple"] = "banana"
+```
+
+**[⬆ back to top](#table-of-contents)**
+## KeyPair Object
+
+A keypair object contains the attributes, and tags for an AWS keypair.
+
+```python
+class KeyPair:
+    def __init__(self):
+        self.attributes = KeyPairAttributes()
+        self.tags = []
+        ...
+```
+
+```python
+@dataclass
+class KeyPairAttributes:
+	KeyPairId: str = None
+	KeyFingerprint: str = None
+	KeyName: str = None
+```
+
+```python
+@dataclass
+class Tags:
+	key: str = None
+	Value: str = None
+```
+
+### Delete Keypair
+
+You can delete a keypair from AWS by calling the delete method on your keypair_object.
+
+```python3
+keypair_object.delete()
+```
+
 **[⬆ back to top](#table-of-contents)**
