@@ -354,7 +354,7 @@ keypair_manager = KeyPairManager()
 ### Retrieve Keypairs
 Retrieve all of your keypairs.
 ```python
-list_of_keypair_objects=retrieve_keypairs()
+list_of_keypair_objects=keypair_manager.retrieve_keypairs()
 ```
 
 ### Retrieve Keypair By Name
@@ -362,32 +362,32 @@ Retrieve all of your keypairs by keypair name.
 AWS keypair names are unique.
 
 ```python
-list_of_keypair_objects=retrieve_keypair_by_name(str:name)
+list_of_keypair_objects=keypair_manager.retrieve_keypair_by_name(str:name)
 ```
 ### Retrieve Keypair By ID
 Retrieve all of your keypairs by keypair ID.
 
 ```python
-list_of_keypair_objects=retrieve_keypair_by_id(str:keypairid)
+list_of_keypair_objects=keypair_manager.retrieve_keypair_by_id(str:keypairid)
 ```
 ### Retrieve Keypair By Fingerprint
 Retrieve all of your keypairs by key fingerprint.
 
 ```python
-list_of_keypair_objects=retrieve_keypair_by_fingerprint(str:fingerprint)
+list_of_keypair_objects=keypair_manager.retrieve_keypair_by_fingerprint(str:fingerprint)
 ```
 ### Retrieve Keypairs By Tag Keyname
 Retrieve all of your keypairs by the name of a tag key, not it's actual tag content.
 
 ```python
-list_of_keypair_objects=retrieve_keypair_by_tag_keyname(str:tagkeyname)
+list_of_keypair_objects=keypair_manager.retrieve_keypair_by_tag_keyname(str:tagkeyname)
 ```
 ### Retrieve Keypairs By Tag
 
 Retrieve all of your keypairs by supplying the name of a tag, and the tag value.
 
 ```python
-list_of_keypair_objects=retrieve_keypair_by_tag(str:key,str:value)
+list_of_keypair_objects=keypair_manager.retrieve_keypair_by_tag(str:key,str:value)
 ```
 ### Upload Keypair RSA
 
@@ -395,7 +395,7 @@ AWS will only accept RSA keys for upload.
 This method will return ONE keypair object with the details of the new key uploaded to AWS.
 
 ```python
-uploadedkey = myKeyPairManager.upload_keypair_rsa(str:keyname, str:ssh_public_key, dict:tags)
+uploadedkey = keypair_manager.upload_keypair_rsa(str:keyname, str:ssh_public_key, dict:tags)
 ```
 where you provide tags for your keypair in the form of a dict, e.g.
 ```python
