@@ -16,6 +16,7 @@ class KeyPairAttributes:
     KeyPairId: str = None
     KeyFingerprint: str = None
     KeyName: str = None
+    KeyType: str = None
     # Tags: list = field(default_factory=list)
 
 
