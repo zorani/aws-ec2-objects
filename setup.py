@@ -24,7 +24,7 @@ setup(
         "ec2objects.ec2api",
         "ec2objects.ec2object",
     ],
-    version="0.0.8",
+    version="0.0.9",
     license="MIT",
     description="ec2objects, represents all aws ec2 services as objects, hiding all those horrible api calls.",
     long_description=long_description,
@@ -32,7 +32,7 @@ setup(
     author="zoran ilievski",
     author_email="pythonic@clientuser.net",
     url="https://github.com/zorani/aws-ec2-objects",
-    download_url="https://github.com/zorani/aws-ec2-objects/archive/refs/tags/v0.0.8.tar.gz",
+    download_url="https://github.com/zorani/aws-ec2-objects/archive/refs/tags/v0.0.9.tar.gz",
     keywords=["aws", "api", "ec2", "objects", "awsapi"],
     install_requires=["boto3"],
     classifiers=[
