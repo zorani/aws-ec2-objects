@@ -29,6 +29,7 @@ class Tags:
 class KeyPairManager:
     def __init__(self):
         self.keypairapi = KeyPairs()
+        self.valid_aws_sshkey_types = ["ssh-rsa", "ssh-ed25519"]
 
     def retrieve_keypairs(self):
         response = self.keypairapi.list_keypairs()
@@ -60,17 +61,30 @@ class KeyPairManager:
         keypair_objects = self._build_keypair_objects_from_response(response)
         return keypair_objects
 
-    def upload_keypair_rsa(self, name, publickey, tag_dict):
+    def upload_keypair(self, name, publickey, tag_dict):
+        self._check_if_valid_publickey(publickey)
         if self._does_keypair_name_exist(name) == True:
             raise KeyPairNameAlreadyExists(f"Key pair name {name} already exists  ")
-        tag_specification = self._build_tag_specification_list(tag_dict)
-        print(tag_specification)
-        self.keypairapi.import_keypair(name, publickey, tag_specification)
+        if tag_dict:
+            tag_specification = self._build_tag_specification_list(tag_dict)
+            # print(tag_specification)
+            self.keypairapi.import_keypair(name, publickey, tag_specification)
+        else:
+            self.keypairapi.import_keypair(name, publickey)
         response = self.retrieve_keypair_by_name(name)
         # print("RESPONSE", response)
         # print(response)
         # keypair_objects = self._build_keypair_objects_from_response(response)
         return response[0]
+
+    def _check_if_valid_publickey(self, publickey):
+        publickeytype = publickey.split(" ")[0]
+        if publickeytype in self.valid_aws_sshkey_types:
+            return True
+        else:
+            raise KeyPairTypeNotSupportedByAWS(
+                f"AWS does not allow ssh key type {publickeytype}"
+            )
 
     def _build_keypair_objects_from_response(self, response):
         keypair_objects = []

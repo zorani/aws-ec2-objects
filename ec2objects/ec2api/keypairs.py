@@ -62,13 +62,20 @@ class KeyPairs:
         )
         return json_results
 
-    def import_keypair(self, name, publickey_string, tag_specification):
+    def import_keypair(self, name, publickey_string, tag_specification=None):
         publickeymaterial = publickey_string.encode("utf-8")
-        json_results = self.ec2_client.import_key_pair(
-            KeyName=name,
-            PublicKeyMaterial=publickeymaterial,
-            TagSpecifications=tag_specification,
-        )
+        if tag_specification:
+            json_results = self.ec2_client.import_key_pair(
+                KeyName=name,
+                PublicKeyMaterial=publickeymaterial,
+                TagSpecifications=tag_specification,
+            )
+        else:
+            json_results = self.ec2_client.import_key_pair(
+                KeyName=name,
+                PublicKeyMaterial=publickeymaterial,
+            )
+
         return json_results
 
     def delete_keypair(self, KeyName):

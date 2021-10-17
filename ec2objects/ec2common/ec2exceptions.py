@@ -26,3 +26,8 @@ class RegionNotFound(Exception):
 class KeyPairNameAlreadyExists(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
+
+
+class KeyPairTypeNotSupportedByAWS(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)

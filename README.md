@@ -32,7 +32,7 @@ Please visit <a href="https://github.com/zorani/aws-ec2-objects">GitHub</a> page
 	   - [Retrieve Keypair By Fingerprint](#retrieve-keypair-by-fingerpring)
 	   - [Retrieve Keypairs By Tag Keyname](#retrieve-keypairs-by-tag-keyname)
 	   - [Retrieve Keypairs By Tag](#retrieve-keypairs-by-tag)
-	   - [Upload Keypair RSA](#upload-keypair-rsa)
+	   - [Upload Keypair](#upload-keypair)
 	- [KeyPair Object](#keypair-object)
 	  - [Delete Keypair](#delete-keypair)
 # How to install
@@ -389,13 +389,15 @@ Retrieve all of your keypairs by supplying the name of a tag, and the tag value.
 ```python
 list_of_keypair_objects=keypair_manager.retrieve_keypair_by_tag(str:key,str:value)
 ```
-### Upload Keypair RSA
+### Upload Keypair
 
-AWS will only accept RSA keys for upload.
+AWS accepts the following ssh key types: (ssh-rsa, ssh-ed25519)
+Exception KeyPairTypeNotSupportedByAWS will be raised if attempt is made to upload an unsupported key type.
 This method will return ONE keypair object with the details of the new key uploaded to AWS.
 
 ```python
-uploadedkey = keypair_manager.upload_keypair_rsa(str:keyname, str:ssh_public_key, dict:tags)
+uploadedkey = keypair_manager.upload_keypair(str:keyname, str:ssh_public_key, dict:tags)
+uploadedkey = keypair_manager.upload_keypair(str:keyname, str:ssh_public_key)
 ```
 where you provide tags for your keypair in the form of a dict, e.g.
 ```python
