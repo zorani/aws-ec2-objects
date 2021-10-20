@@ -64,7 +64,7 @@ class KeyPairs:
 
     def import_keypair(self, name, publickey_string, tag_specification=None):
         publickeymaterial = publickey_string.encode("utf-8")
-        if tag_specification:
+        if tag_specification != None:
             json_results = self.ec2_client.import_key_pair(
                 KeyName=name,
                 PublicKeyMaterial=publickeymaterial,
