@@ -31,3 +31,8 @@ class KeyPairNameAlreadyExists(Exception):
 class KeyPairTypeNotSupportedByAWS(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
+
+
+class AvailabilityZoneNotFound(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)

@@ -6,6 +6,8 @@ from .ec2object.image import ImageManager as ImageManager
 from .ec2object.image import Image as Image
 from .ec2object.keypair import KeyPairManager as KeyPairManager
 from .ec2object.keypair import KeyPair as KeyPair
+from .ec2object.instance import InstanceManager as InstanceManager
+from .ec2object.instance import Instance as Instance
 
 ###API TESTS####DELETE
 # from .ec2api.images import Images as Images

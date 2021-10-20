@@ -73,12 +73,24 @@ class RegionManager:
             )
             availabilityzones_datas = availabilityzones_json["AvailabilityZones"]
             for availabilityzones_data in availabilityzones_datas:
+                # print(availabilityzones_data)
                 newavailabilityzone = AvailabilityZones(**availabilityzones_data)
+                # print(newavailabilityzone)
                 availability_zones.append(newavailabilityzone)
         except:
-            pass
-
+            raise AvailabilityZoneNotFound(
+                f"Availability Zone not found for {regionname}"
+            )
+        # print(availability_zones)
         return availability_zones
+
+    def retrieve_availability_zone_names_for_region(self, regionname):
+        my_availability_zones_list = self.retrieve_availability_zones(regionname)
+        my_availability_zones: AvailabilityZones
+        availability_zone_names = []
+        for my_availability_zones in my_availability_zones_list:
+            availability_zone_names.append(my_availability_zones.ZoneName)
+        return availability_zone_names
 
 
 class Region:
