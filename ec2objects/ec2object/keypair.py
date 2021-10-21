@@ -61,11 +61,11 @@ class KeyPairManager:
         keypair_objects = self._build_keypair_objects_from_response(response)
         return keypair_objects
 
-    def upload_keypair(self, name, publickey, tag_dict):
+    def upload_keypair(self, name, publickey, tag_dict=None):
         self._check_if_valid_publickey(publickey)
         if self._does_keypair_name_exist(name) == True:
             raise KeyPairNameAlreadyExists(f"Key pair name {name} already exists  ")
-        if tag_dict:
+        if tag_dict != None:
             tag_specification = self._build_tag_specification_list(tag_dict)
             # print(tag_specification)
             self.keypairapi.import_keypair(name, publickey, tag_specification)

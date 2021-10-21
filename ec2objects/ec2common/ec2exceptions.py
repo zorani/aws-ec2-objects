@@ -36,3 +36,8 @@ class KeyPairTypeNotSupportedByAWS(Exception):
 class AvailabilityZoneNotFound(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
+
+
+class EC2InstanceNolongerExists(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)

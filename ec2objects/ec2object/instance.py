@@ -92,6 +92,9 @@ class InstanceManager:
 
         newinstance = Instance()
         newinstance.attributes = InstanceAttributes(**instanceinfo_instance)
+        region = newinstance.attributes.Placement["AvailabilityZone"][0:-1]
+        # ["Placement"]["AvailabilityZone"][0:-1]
+        newinstance.region = region
 
         return newinstance
 
@@ -113,6 +116,85 @@ class InstanceManager:
 
 
 class Instance:
+
+    # Might want to check status of machines... e.g. if a machine is terminated you can't restart it.
+
     def __init__(self):
         self.instanceapi = Instances()
         self.attributes = InstanceAttributes()
+        self.region = None
+
+    def start(self):
+        self.instance_checks()
+        if (self.instance_state() == "pending") or (self.instance_state() == "running"):
+            return
+        newInstanceId = self.instanceapi.start_instance(
+            self.attributes.InstanceId, self.region
+        )
+        self.attributes.InstanceId = newInstanceId
+        self.update_instance_state()
+
+    def stop(self):
+        self.instance_checks()
+        if (self.instance_state() == "stopping") or (
+            self.instance_state() == "stopped"
+        ):
+            return
+        self.instanceapi.stop_instance(self.attributes.InstanceId, self.region)
+        self.update_instance_state()
+
+    def delete(self):
+        self.instance_checks()
+        if self.instance_state() == "terminated":
+            return
+        # According to https://github.com/boto/boto3/issues/176 sometimes you need to stop the instance first
+        # to avoid issues.
+        self.stop()
+        self.instanceapi.terminate_instance(self.attributes.InstanceId, self.region)
+        # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/terminating-instances.html
+        # By default, Amazon EBS root device volumes are automatically deleted when the instance terminates.
+        # However, by default, any additional EBS volumes that you attach at launch, or any EBS volumes that
+        # you attach to an existing instance persist even after the instance terminates. This behavior is
+        # controlled by the volume's DeleteOnTermination attribute, which you can modify.
+
+    def reboot(self):
+        self.instance_checks()
+        self.instanceapi.reboot_instance(self.attributes.InstanceId, self.region)
+        pass
+
+    def instance_checks(self):
+        self.does_instance_exist()
+        self.update_instance_state()
+
+    def update_instance_state(self):
+        # First we ask boto3 to update the attributes of the instance
+        self.instanceapi.reload_instance(self.attributes.InstanceId, self.region)
+        # Then we get the latest info and update the attributes.
+        updated_attributes = self.instanceapi.latest_instance_info(
+            self.attributes.InstanceId, self.region
+        )
+        self.attributes = InstanceAttributes(**updated_attributes)
+
+    def instance_state(self):
+        # Will return one of these values.
+        # https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html#EC2.Instance.state
+        # 0 : pending
+        # 16 : running
+        # 32 : shutting-down
+        # 48 : terminated
+        # 64 : stopping
+        # 80 : stopped
+        self.update_instance_state()
+        state: dict
+        state = self.attributes.State
+        return state["Name"]
+
+    def does_instance_exist(self):
+        if self.attributes.InstanceId in self.instanceapi.list_instances(self.region):
+            if self.instance_state() == "terminated":
+                raise EC2InstanceNolongerExists(
+                    f"{self.attributes.InstanceId} no longer exists."
+                )
+            return True
+        else:
+            return False

@@ -62,15 +62,69 @@ class Instances:
 
         return updated_instances_info_list
 
-    def stop_instance(self, instance_id, arg_region=None):
+    def latest_instance_info(self, instance_id, arg_region):
+        ec2_client = boto3.client("ec2", region_name=arg_region)
+        latest_instances_info_list = ec2_client.describe_instances(
+            InstanceIds=[instance_id]
+        )
+        latest_instances_info_attributes = latest_instances_info_list["Reservations"][
+            0
+        ]["Instances"][0]
+        return latest_instances_info_attributes
 
-        if arg_region != None:
-            # If a region is specified we create the ec2 instance in that region.
-            ec2_client = boto3.client("ec2", region_name=arg_region)
-        else:
-            ec2_client = self.ec2_client
+    def stop_instance(self, instance_id, arg_region):
+        ec2_resource = boto3.resource("ec2", region_name=arg_region)
+        instance = ec2_resource.Instance(instance_id)
+        print("sent stop signal")
+        instance.stop()
+        print("waiting untill stop..")
+        instance.wait_until_stopped()
+        print("stopped")
 
-        ec2_client.stop_instances(InstanceIds=[instance_id])
+    def start_instance(self, instance_id, arg_region):
+        ec2_resource = boto3.resource("ec2", region_name=arg_region)
+        instance = ec2_resource.Instance(instance_id)
+        print("sent start signal")
+        info = instance.start()
+        print(instance_id)
+        print(info["StartingInstances"][0]["InstanceId"])
+        print("waiting untill start..")
+        instance.wait_until_running()
+        print("started")
+        # Amazon EC2 docs state that under some circumstances the instance ID changes,
+        # well... to catch this, we return the instance id returned by start
 
-    def list_instance(self):
-        pass
+        return info["StartingInstances"][0]["InstanceId"]
+
+    def terminate_instance(self, instance_id, arg_region):
+        ec2_resource = boto3.resource("ec2", region_name=arg_region)
+        instance = ec2_resource.Instance(instance_id)
+        print("Sending instance term signal...")
+        instance.terminate()
+        print("waiting untill terminater..")
+        instance.wait_until_terminated()
+        print("terminate")
+
+    def reboot_instance(self, instance_id, arg_region):
+        ec2_resource = boto3.resource("ec2", region_name=arg_region)
+        instance = ec2_resource.Instance(instance_id)
+        print("sending reboot signal")
+        instance.reboot()
+        print("waiting for reboot")
+        instance.wait_until_running()
+        print("Rebooted")
+
+    def reload_instance(self, instance_id, arg_region):
+        # Updates the attributes of the instance resource.
+        ec2_resource = boto3.resource("ec2", region_name=arg_region)
+        instance = ec2_resource.Instance(instance_id)
+        instance.reload()
+
+    def list_instances(self, arg_region):
+        ec2_client = boto3.client("ec2", region_name=arg_region)
+        response = ec2_client.describe_instances()
+        instances_list = []
+        for reservation in response["Reservations"]:
+            for instance in reservation["Instances"]:
+                instances_list.append(instance["InstanceId"])
+        return instances_list
