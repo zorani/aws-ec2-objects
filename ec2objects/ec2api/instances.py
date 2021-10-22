@@ -24,7 +24,7 @@ class Instances:
         tag_specification=None,
         arg_region=None,
     ):
-        if arg_region:
+        if arg_region != None:
             # If a region is specified we create the ec2 instance in that region.
             ec2_client = boto3.client("ec2", region_name=arg_region)
         else:
