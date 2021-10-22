@@ -8,6 +8,12 @@ from .ec2object.keypair import KeyPairManager as KeyPairManager
 from .ec2object.keypair import KeyPair as KeyPair
 from .ec2object.instance import InstanceManager as InstanceManager
 from .ec2object.instance import Instance as Instance
+from .ec2object.networkinterface import (
+    NetworkInterfaceManager as NetworkInterfaceManager,
+)
+from .ec2object.networkinterface import NetworkInterface as NetworkInterface
+from .ec2object.vpc import VPCManager as VPCManager
+from .ec2object.vpc import VPC as VPC
 
 ###API TESTS####DELETE
 # from .ec2api.images import Images as Images
