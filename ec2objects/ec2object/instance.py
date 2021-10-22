@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from ..ec2api.instances import Instances
 
+
 from ..ec2common.ec2exceptions import *
 
 import json
