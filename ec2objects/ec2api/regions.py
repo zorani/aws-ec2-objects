@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-
-import os
-import time
-import queue
-import threading
 import datetime
-import random
 import json
+import os
+import queue
+import random
+import threading
+import time
+
 import boto3
 
 
@@ -25,11 +25,16 @@ class Regions:
 
     def list_availabitily_zones_for_region(self, regionname):
         local_client = boto3.client("ec2", region_name=regionname)
-        availabilityzones_json = local_client.describe_availability_zones(
-            Filters=[
-                {"Name": "region-name", "Values": [regionname]},
-                # {"Name": "group-name", "Values": [regionname]},
-            ],
-        )
+        # print(regionname)
+        try:
+            availabilityzones_json = local_client.describe_availability_zones(
+                Filters=[
+                    {"Name": "region-name", "Values": [regionname]},
+                ],
+                # AllAvailabilityZones=True,
+            )
+        except:
+            availabilityzones_json = {}
+
         return availabilityzones_json
         # return self.availabilityzoens[regionname]
