@@ -41,3 +41,8 @@ class AvailabilityZoneNotFound(Exception):
 class EC2InstanceNolongerExists(Exception):
     def __init__(self, *args, **kwargs):
         Exception.__init__(self, *args, **kwargs)
+
+
+class VPCDoesNotExist(Exception):
+    def __init__(self, *args, **kwargs):
+        Exception.__init__(self, *args, **kwargs)
