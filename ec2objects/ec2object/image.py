@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from ..ec2api.images import Images
-
-from ..ec2common.ec2exceptions import *
-
 import json
+import re
 import threading
 import time
-import re
+from dataclasses import dataclass
+from dataclasses import field
+
+from ..ec2api.images import Images
+from ..ec2common.ec2exceptions import *
 
 
 @dataclass

@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from ..ec2api.regions import Regions
-
-from ..ec2common.ec2exceptions import *
-
 import json
+import re
 import threading
 import time
-import re
+from dataclasses import dataclass
+from dataclasses import field
+
+from ..ec2api.regions import Regions
+from ..ec2common.ec2exceptions import *
 
 
 @dataclass
@@ -78,9 +78,10 @@ class RegionManager:
                 # print(newavailabilityzone)
                 availability_zones.append(newavailabilityzone)
         except:
-            raise AvailabilityZoneNotFound(
-                f"Availability Zone not found for {regionname}"
-            )
+            availability_zones = []
+            # raise AvailabilityZoneNotFound(
+            #    f"Availability Zone not found for {regionname}"
+            # )
         # print(availability_zones)
         return availability_zones
 

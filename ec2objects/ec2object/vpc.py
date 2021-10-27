@@ -1,8 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from ..ec2api.vpcs import VPCs
+from dataclasses import dataclass
+from dataclasses import field
 
+import boto3
+
+from ..ec2api.vpcs import VPCs
 from ..ec2common.ec2exceptions import *
 
 # See vpc notes at the end of this file.
@@ -38,14 +41,83 @@ class VPCManager:
         )
         newvpc = VPC()
         newvpc.attributes = VPCAttributes(**vpcattributes)
+        newvpc.region = arg_region
 
         return newvpc
 
+    def get_vpc_in_region(self, VPCId, arg_region):
+        # Searches for the VPCId in a specific region
+        vpc_attributes = self.vpcapi.describe_vpc(VPCId, arg_region)
+        newvpc = VPC()
+        newvpc.attributes = VPCAttributes(**vpc_attributes)
+        return newvpc
+
+    def get_all_vpcs_in_region(self, arg_region):
+        # Gets all vpcs in a specified region
+        vpc_objects = []
+        response = self.vpcapi.describe_vpcs_in_region(arg_region)
+        vpcs = response["Vpcs"]
+        for vpc in vpcs:
+            newvpc = VPC()
+            newvpc.attributes = VPCAttributes(**vpc)
+            newvpc.region = arg_region
+            vpc_objects.append(newvpc)
+        return vpc_objects
+
+    def get_vpc(self, VPCId):
+        # Searches all regions for a vpc with ID vpcid
+        all_vpcs, result = self.does_vpc_exist(VPCId)
+        if not result:
+            raise VPCDoesNotExist(f"{VPCId} does not exist. ")
+        else:
+            vpc: VPC
+            for vpc in all_vpcs:
+                if vpc.attributes.VpcId == VPCId:
+                    return vpc
+
+    def get_all_vpcs(self):
+        # Gets all vpcs accross all regions
+        vpc_objects_to_return = []
+        region_list = self.vpcapi.get_all_region_names()
+        vpc_object: VPC
+        for region in region_list:
+            vpc_objects = self.get_all_vpcs_in_region(region)
+            for vpc_object in vpc_objects:
+                vpc_object.region = region
+                vpc_objects_to_return.append(vpc_object)
+        return vpc_objects_to_return
+
+    def get_vpc_region(self, VPCid):
+        # For a given VPCid returns its region
+        all_vpcs, result = self.does_vpc_exist(VPCid)
+        if not result:
+            raise VPCDoesNotExist(f"{VPCid} does not exist. ")
+        else:
+            vpc: VPC
+            for vpc in all_vpcs:
+                if vpc.attributes.VpcId == VPCid:
+                    return vpc.region
+
+    def does_vpc_exist(self, VPCid):
+        # To check if a vpc exists we need to build all the VPC objects.
+        # So, we mayaswell return the full list if it is needed also.
+        vpcs = self.get_all_vpcs()
+        vpc: VPC
+        for vpc in vpcs:
+            if vpc.attributes.VpcId == VPCid:
+                return vpcs, True
+        return vpcs, False
+
 
 class VPC:
+    # Perhaps a vpc object should be able to...
+    # create subnets,
     def __init__(self):
         self.attributes = VPCAttributes()
         self.region = None
+
+    def create_subnet(self, CidrBlock: str):
+        self.attributes.A
 
 
 # VPC quick notes.
